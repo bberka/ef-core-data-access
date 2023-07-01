@@ -1,7 +1,6 @@
-﻿using System;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
-namespace EntityFrameworkCore.QueryBuilder.Interfaces
+namespace EntityFrameworkCore.Ext.Abstractions.Interfaces
 {
     public interface ISorting<T> : ISorting
     {

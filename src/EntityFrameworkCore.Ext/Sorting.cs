@@ -1,23 +1,19 @@
-﻿using EntityFrameworkCore.QueryBuilder.Interfaces;
-using System;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
-namespace EntityFrameworkCore.QueryBuilder
+namespace EntityFrameworkCore.Ext;
+
+public class Sorting<T> : Sorting,
+                          ISorting<T>
 {
-    public class Sorting<T> : Sorting, ISorting<T>
-    {
-        internal Sorting()
-        { }
+  internal Sorting() { }
 
-        public Expression<Func<T, object>> KeySelector { get; internal set; }
-    }
+  public Expression<Func<T, object>> KeySelector { get; internal set; }
+}
 
-    public class Sorting : ISorting
-    {
-        internal Sorting()
-        { }
+public class Sorting : ISorting
+{
+  internal Sorting() { }
 
-        public string FieldName { get; internal set; }
-        public SortDirection SortDirection { get; internal set; }
-    }
+  public string FieldName { get; internal set; }
+  public SortDirection SortDirection { get; internal set; }
 }

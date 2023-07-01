@@ -1,7 +1,3 @@
-﻿using System;
+﻿namespace EntityFrameworkCore.Ext.Attributes;
 
-namespace EntityFrameworkCore.AutoHistory.Attributes
-{
-    public class ExcludeFromHistoryAttribute : Attribute
-    { }
-}
+public class ExcludeFromHistoryAttribute : Attribute { }

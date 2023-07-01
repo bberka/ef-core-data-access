@@ -1,13 +1,9 @@
-﻿using EntityFrameworkCore.QueryBuilder.Interfaces;
+﻿namespace EntityFrameworkCore.Ext;
 
-namespace EntityFrameworkCore.QueryBuilder
+public class Topping : ITopping
 {
-    public class Topping : ITopping
-    {
-        internal Topping()
-        { }
+  internal Topping() { }
 
-        public int? TopRows { get; internal set; }
-        public bool IsEnabled => TopRows > 0;
-    }
+  public int? TopRows { get; internal set; }
+  public bool IsEnabled => TopRows > 0;
 }

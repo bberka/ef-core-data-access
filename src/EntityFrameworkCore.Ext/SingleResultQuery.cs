@@ -1,28 +1,29 @@
-﻿using EntityFrameworkCore.QueryBuilder.Interfaces;
+﻿namespace EntityFrameworkCore.Ext;
 
-namespace EntityFrameworkCore.QueryBuilder
+public class SingleResultQuery<T> : Query<T>,
+                                    ISingleResultQuery<T> where T : class
 {
-    public class SingleResultQuery<T> : Query<T>, ISingleResultQuery<T> where T : class
-    {
-        public static ISingleResultQuery<T> New() => new SingleResultQuery<T>();
+  #region Ctor
 
-        #region Ctor
+  internal SingleResultQuery() { }
 
-        internal SingleResultQuery()
-        { }
+  #endregion Ctor
 
-        #endregion Ctor
-    }
+  public static ISingleResultQuery<T> New() {
+    return new SingleResultQuery<T>();
+  }
+}
 
-    public class SingleResultQuery<T, TResult> : Query<T, TResult>, ISingleResultQuery<T, TResult> where T : class
-    {
-        public static ISingleResultQuery<T, TResult> New() => new SingleResultQuery<T, TResult>();
+public class SingleResultQuery<T, TResult> : Query<T, TResult>,
+                                             ISingleResultQuery<T, TResult> where T : class
+{
+  #region Ctor
 
-        #region Ctor
+  internal SingleResultQuery() { }
 
-        internal SingleResultQuery()
-        { }
+  #endregion Ctor
 
-        #endregion Ctor
-    }
+  public static ISingleResultQuery<T, TResult> New() {
+    return new SingleResultQuery<T, TResult>();
+  }
 }

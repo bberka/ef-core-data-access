@@ -1,83 +1,75 @@
-﻿using EntityFrameworkCore.QueryBuilder.Interfaces;
+﻿using EntityFrameworkCore.Ext.Abstractions.Interfaces;
 
-namespace EntityFrameworkCore.QueryBuilder
+namespace EntityFrameworkCore.Ext;
+
+public class MultipleResultQuery<T> : Query<T>,
+                                      IMultipleResultQuery<T> where T : class
 {
-    public class MultipleResultQuery<T> : Query<T>, IMultipleResultQuery<T> where T : class
-    {
-        public static IMultipleResultQuery<T> New() => new MultipleResultQuery<T>();
+  #region Ctor
 
-        #region Ctor
+  internal MultipleResultQuery() { }
 
-        internal MultipleResultQuery()
-        { }
+  #endregion Ctor
 
-        #endregion Ctor
+  public static IMultipleResultQuery<T> New() {
+    return new MultipleResultQuery<T>();
+  }
 
-        #region IMultipleResultQuery<T> Members
+  #region IMultipleResultQuery<T> Members
 
-        public IPaging Paging { get; internal set; } = new Paging();
-        public ITopping Topping { get; internal set; } = new Topping();
+  public IPaging Paging { get; internal set; } = new Paging();
+  public ITopping Topping { get; internal set; } = new Topping();
 
-        public IMultipleResultQuery<T> Page(int? pageIndex, int? pageSize)
-        {
-            if (Paging is Paging paging)
-            {
-                paging.PageIndex = pageIndex;
-                paging.PageSize = pageSize;
-            }
-
-            return this;
-        }
-
-        public IMultipleResultQuery<T> Top(int? topRows)
-        {
-            if (Topping is Topping topping)
-            {
-                topping.TopRows = topRows;
-            }
-
-            return this;
-        }
-
-        #endregion IMultipleResultQuery<T> Members
+  public IMultipleResultQuery<T> Page(int? pageIndex, int? pageSize) {
+    if (Paging is Paging paging) {
+      paging.PageIndex = pageIndex;
+      paging.PageSize = pageSize;
     }
 
-    public class MultipleResultQuery<T, TResult> : Query<T, TResult>, IMultipleResultQuery<T, TResult> where T : class
-    {
-        public static IMultipleResultQuery<T, TResult> New() => new MultipleResultQuery<T, TResult>();
+    return this;
+  }
 
-        #region Ctor
+  public IMultipleResultQuery<T> Top(int? topRows) {
+    if (Topping is Topping topping) topping.TopRows = topRows;
 
-        internal MultipleResultQuery()
-        { }
+    return this;
+  }
 
-        #endregion Ctor
+  #endregion IMultipleResultQuery<T> Members
+}
 
-        #region IMultipleResultQuery<T, TResult> Members
-        public IPaging Paging { get; internal set; } = new Paging();
-        public ITopping Topping { get; internal set; } = new Topping();
+public class MultipleResultQuery<T, TResult> : Query<T, TResult>,
+                                               IMultipleResultQuery<T, TResult> where T : class
+{
+  #region Ctor
 
-        public IMultipleResultQuery<T, TResult> Page(int? pageIndex, int? pageSize)
-        {
-            if (Paging is Paging paging)
-            {
-                paging.PageIndex = pageIndex;
-                paging.PageSize = pageSize;
-            }
+  internal MultipleResultQuery() { }
 
-            return this;
-        }
+  #endregion Ctor
 
-        public IMultipleResultQuery<T, TResult> Top(int? topRows)
-        {
-            if (Topping is Topping topping)
-            {
-                topping.TopRows = topRows;
-            }
+  public static IMultipleResultQuery<T, TResult> New() {
+    return new MultipleResultQuery<T, TResult>();
+  }
 
-            return this;
-        }
+  #region IMultipleResultQuery<T, TResult> Members
 
-        #endregion IMultipleResultQuery<T, TResult> Members
+  public IPaging Paging { get; internal set; } = new Paging();
+  public ITopping Topping { get; internal set; } = new Topping();
+
+  public IMultipleResultQuery<T, TResult> Page(int? pageIndex, int? pageSize) {
+    if (Paging is Paging paging) {
+      paging.PageIndex = pageIndex;
+      paging.PageSize = pageSize;
     }
+
+    return this;
+  }
+
+  public IMultipleResultQuery<T, TResult> Top(int? topRows) {
+    if (Topping is Topping topping) topping.TopRows = topRows;
+
+    return this;
+  }
+
+  #endregion IMultipleResultQuery<T, TResult> Members
 }

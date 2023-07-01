@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace EntityFrameworkCore.Repository.Interfaces
+﻿namespace EntityFrameworkCore.Ext.Abstractions.Interfaces
 {
     public interface IRepository : IDisposable
     { }

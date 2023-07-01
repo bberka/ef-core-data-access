@@ -1,5 +1,5 @@
 ﻿
-namespace EntityFrameworkCore.QueryBuilder.Interfaces
+namespace EntityFrameworkCore.Ext.Abstractions.Interfaces
 {
     public interface IQueryFactory<T> where T : class
     {

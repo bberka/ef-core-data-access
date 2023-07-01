@@ -1,14 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System;
-using System.Collections.Generic;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Transactions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using IsolationLevel = System.Data.IsolationLevel;
 
-namespace EntityFrameworkCore.UnitOfWork.Interfaces
+namespace EntityFrameworkCore.Ext.Abstractions.Interfaces
 {
-    using System.Data;
-
     public interface ISyncUnitOfWork : IRepositoryFactory, IDisposable
     {
         bool HasTransaction();

@@ -1,7 +1,6 @@
-﻿using EntityFrameworkCore.Repository.Interfaces;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace EntityFrameworkCore.UnitOfWork.Interfaces
+namespace EntityFrameworkCore.Ext.Abstractions.Interfaces
 {
     public interface IRepositoryFactory
     {

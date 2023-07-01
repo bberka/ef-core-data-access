@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace EntityFrameworkCore.Repository.Collections
+﻿namespace EntityFrameworkCore.Ext.Abstractions.Collections
 {
     public interface IPagedList<T>
     {

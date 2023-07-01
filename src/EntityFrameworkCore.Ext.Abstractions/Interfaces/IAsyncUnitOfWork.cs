@@ -1,14 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
+﻿using System.Data;
 using System.Data.Common;
-using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
-namespace EntityFrameworkCore.UnitOfWork.Interfaces
+namespace EntityFrameworkCore.Ext.Abstractions.Interfaces
 {
-    using System.Data;
-
     public interface IAsyncUnitOfWork : IRepositoryFactory, IDisposable
     {
         Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess = true, bool ensureAutoHistory = false, CancellationToken cancellationToken = default);

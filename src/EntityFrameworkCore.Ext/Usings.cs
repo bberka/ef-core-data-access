@@ -1,6 +1,20 @@
-﻿namespace EntityFrameworkCore.Ext;
-
-public class Usings
-{
-  
-}
+﻿global using Microsoft.EntityFrameworkCore.Metadata;
+global using Microsoft.EntityFrameworkCore.Query;
+global using Microsoft.EntityFrameworkCore.Query.Internal;
+global using Microsoft.EntityFrameworkCore.Design;
+global using Microsoft.EntityFrameworkCore.Diagnostics;
+global using Microsoft.EntityFrameworkCore.Diagnostics.Internal;
+global using Microsoft.EntityFrameworkCore.Infrastructure;
+global using Microsoft.EntityFrameworkCore.Storage;
+global using Microsoft.EntityFrameworkCore.Update;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.ValueGeneration;
+global using Microsoft.EntityFrameworkCore.Utilities;
+global using EntityFrameworkCore.Ext.Abstractions;
+global using EntityFrameworkCore.Ext.Serialization;
+global using EntityFrameworkCore.Ext;
+global using EntityFrameworkCore.Ext.Factories;
+global using EntityFrameworkCore.Ext.Collections;
+global using EntityFrameworkCore.Ext.Attributes;
+global using EntityFrameworkCore.Ext.Abstractions.Collections;
+global using EntityFrameworkCore.Ext.Abstractions.Interfaces;

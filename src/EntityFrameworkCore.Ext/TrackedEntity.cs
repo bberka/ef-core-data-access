@@ -1,18 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace EntityFrameworkCore.AutoHistory
+namespace EntityFrameworkCore.Ext;
+
+public class TrackedEntity
 {
-    public class TrackedEntity
-    {
-        public EntityEntry EntityEntry { get; }
-        public EntityState EntityState { get; }
+  public TrackedEntity(EntityEntry entityEntry) {
+    EntityEntry = entityEntry ?? throw new ArgumentNullException(nameof(entityEntry), $"{nameof(entityEntry)} cannot be null.");
+    EntityState = entityEntry.State;
+  }
 
-        public TrackedEntity(EntityEntry entityEntry)
-        {
-            EntityEntry = entityEntry ?? throw new ArgumentNullException(nameof(entityEntry), $"{nameof(entityEntry)} cannot be null.");
-            EntityState = entityEntry.State;
-        }
-    }
+  public EntityEntry EntityEntry { get; }
+  public EntityState EntityState { get; }
 }

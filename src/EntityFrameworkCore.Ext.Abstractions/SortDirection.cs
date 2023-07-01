@@ -1,5 +1,5 @@
 ﻿
-namespace EntityFrameworkCore.QueryBuilder
+namespace EntityFrameworkCore.Ext.Abstractions
 {
     public enum SortDirection
     {

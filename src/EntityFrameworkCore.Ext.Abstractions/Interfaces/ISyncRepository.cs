@@ -1,12 +1,8 @@
-﻿using EntityFrameworkCore.QueryBuilder.Interfaces;
+﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 
-namespace EntityFrameworkCore.Repository.Interfaces
+namespace EntityFrameworkCore.Ext.Abstractions.Interfaces
 {
     public interface ISyncRepository : IRepository, IDisposable
     { }

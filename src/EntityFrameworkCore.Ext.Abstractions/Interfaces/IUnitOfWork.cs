@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
 
-namespace EntityFrameworkCore.UnitOfWork.Interfaces
+namespace EntityFrameworkCore.Ext.Abstractions.Interfaces
 {
     public interface IUnitOfWork : ISyncUnitOfWork, IAsyncUnitOfWork, IDisposable
     {

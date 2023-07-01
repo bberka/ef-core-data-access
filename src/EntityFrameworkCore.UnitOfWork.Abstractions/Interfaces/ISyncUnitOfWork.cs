@@ -19,11 +19,11 @@ namespace EntityFrameworkCore.UnitOfWork.Interfaces
         void EnlistTransaction(Transaction transaction);
         Transaction GetEnlistedTransaction();
         void BeginTransaction(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted);
-        void Commit();
-        void Rollback();
+        //void Commit();
+        //void Rollback();
         int ExecuteSqlCommand(string sql, params object[] parameters);
         IList<T> FromSql<T>(string sql, params object[] parameters) where T : class;
-        void ChangeDatabase(string database);
+        //void ChangeDatabase(string database);
         void TrackGraph(object rootEntity, Action<EntityEntryGraphNode> callback);
         void TrackGraph<TState>(object rootEntity, TState state, Func<EntityEntryGraphNode<TState>, bool> callback);
     }

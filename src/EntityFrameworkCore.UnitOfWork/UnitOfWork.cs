@@ -25,7 +25,7 @@ namespace EntityFrameworkCore.UnitOfWork
 {
     using System.Data;
 
-    public class UnitOfWork : IUnitOfWork
+    public abstract class UnitOfWork : IUnitOfWork
     {
         #region Private Fields
 

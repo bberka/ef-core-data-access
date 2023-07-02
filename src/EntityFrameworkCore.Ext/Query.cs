@@ -59,12 +59,11 @@ public abstract class Query<T> : IQuery<T> where T : class
     return this;
   }
 
-  public IQuery<T> Include(params Func<IQueryable<T>, IIncludableQueryable<T, object>>[] includes) {
-    if (includes != null)
-      foreach (var include in includes)
-        if (include != null)
-          Includes.Add(include);
-
+  public IQuery<T> Include(params Func<IQueryable<T>, IIncludableQueryable<T, object>>[]? includes) {
+    if (includes == null) return this;
+    foreach (var include in includes)
+      if (include != null)
+        Includes.Add(include);
     return this;
   }
 

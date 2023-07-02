@@ -6,16 +6,16 @@ using IsolationLevel = System.Data.IsolationLevel;
 
 namespace EntityFrameworkCore.Ext.Abstractions.Interfaces
 {
-    public interface ISyncUnitOfWork : IRepositoryFactory, IDisposable
+    public interface ISyncUnitOfWork : IDisposable
     {
-        bool HasTransaction();
+        // bool HasTransaction();
         bool HasChanges();
         int SaveChanges(bool acceptAllChangesOnSuccess = true, bool ensureAutoHistory = false);
         void DiscardChanges();
-        void UseTransaction(DbTransaction transaction, Guid? transactionId = null);
-        void EnlistTransaction(Transaction transaction);
-        Transaction GetEnlistedTransaction();
-        void BeginTransaction(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted);
+        // void UseTransaction(DbTransaction transaction, Guid? transactionId = null);
+        // void EnlistTransaction(Transaction transaction);
+        // Transaction GetEnlistedTransaction();
+        // void BeginTransaction(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted);
         //void Commit();
         //void Rollback();
         int ExecuteSqlCommand(string sql, params object[] parameters);
@@ -25,6 +25,6 @@ namespace EntityFrameworkCore.Ext.Abstractions.Interfaces
         void TrackGraph<TState>(object rootEntity, TState state, Func<EntityEntryGraphNode<TState>, bool> callback);
     }
 
-    public interface ISyncUnitOfWork<T> : ISyncUnitOfWork, IRepositoryFactory<T>, IDisposable where T : DbContext
+    public interface ISyncUnitOfWork<T> : ISyncUnitOfWork, IDisposable where T : DbContext
     { }
 }

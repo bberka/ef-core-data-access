@@ -4,10 +4,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace EntityFrameworkCore.Ext.Abstractions.Interfaces
 {
-    public interface ISyncRepository : IRepository, IDisposable
-    { }
-
-    public interface ISyncRepository<T> : ISyncRepository, IQueryFactory<T>, IDisposable where T : class
+    public interface ISyncRepository<T> : IQueryFactory<T> where T : class
     {
         IList<T> Search(IQuery<T> query);
         IList<TResult> Search<TResult>(IQuery<T, TResult> query);

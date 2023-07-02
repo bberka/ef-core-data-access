@@ -2,10 +2,7 @@
 
 namespace EntityFrameworkCore.Ext.Abstractions.Interfaces
 {
-    public interface IAsyncRepository : IRepository, IDisposable
-    { }
-
-    public interface IAsyncRepository<T> : IAsyncRepository, IQueryFactory<T>, IDisposable where T : class
+    public interface IAsyncRepository<T> : IQueryFactory<T> where T : class
     {
         Task<IList<T>> SearchAsync(IQuery<T> query, CancellationToken cancellationToken = default);
         Task<IList<TResult>> SearchAsync<TResult>(IQuery<T, TResult> query, CancellationToken cancellationToken = default);

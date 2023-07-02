@@ -11,55 +11,27 @@ using IsolationLevel = System.Data.IsolationLevel;
 
 namespace EntityFrameworkCore.Ext;
 
-public abstract class UnitOfWorkBase : IUnitOfWork
+public abstract class UnitOfWorkBase<T> : IUnitOfWorkBase where T : DbContext
 {
   #region Ctor
 
   /// <param name="dbContext">Injected</param>
-  public UnitOfWorkBase(DbContext dbContext) {
+  protected UnitOfWorkBase(T dbContext) {
     DbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext), $"{nameof(dbContext)} cannot be null.");
-    _repositories = new ConcurrentDictionary<string, IRepository>();
   }
 
   #endregion Ctor
 
   #region Private Fields
 
-  private IDbContextTransaction _transaction;
-  private readonly ConcurrentDictionary<string, IRepository> _repositories;
+  private IDbContextTransaction? _transaction;
 
   #endregion Private Fields
 
-  #region IRepositoryFactory Members
-
-  /// <typeparam name="T">Custom repository interface</typeparam>
-  public T CustomRepository<T>() where T : class {
-    if (!typeof(T).IsInterface) throw new ArgumentException("Generic type should be an interface.");
-
-    static IRepository Factory(DbContext dbContext, Type type) {
-      return (IRepository)AppDomain.CurrentDomain.GetAssemblies()
-                                   .SelectMany(selector => selector.GetTypes())
-                                   .Where(predicate => type.IsAssignableFrom(predicate) && !predicate.IsInterface && !predicate.IsAbstract)
-                                   .Select(selector => ActivatorUtilities.CreateInstance(dbContext.TryGetApplicationServiceProvider(), selector, dbContext))
-                                   .SingleOrDefault();
-    }
-
-    return DbContext.TryGetService<T>() ?? (T)GetRepository(typeof(T), Factory, "Custom");
-  }
-
-  public IRepository<T> Repository<T>() where T : class {
-    static IRepository Factory(DbContext dbContext, Type type) {
-      return new Repository<T>(dbContext);
-    }
-
-    return DbContext.TryGetService<IRepository<T>>() ?? (IRepository<T>)GetRepository(typeof(T), Factory, "Generic");
-  }
-
-  #endregion IRepositoryFactory Members
 
   #region IUnitOfWork Members
 
-  public DbContext DbContext { get; }
+  protected DbContext DbContext { get; }
 
   public TimeSpan? Timeout {
     get {
@@ -105,13 +77,19 @@ public abstract class UnitOfWorkBase : IUnitOfWork
     if (!HasChanges()) return 0;
 
     bool autoDetectChangesEnabled;
-
+    if(!HasTransaction()) BeginTransaction();
     if (!(autoDetectChangesEnabled = DbContext.ChangeTracker.AutoDetectChangesEnabled)) DbContext.ChangeTracker.AutoDetectChangesEnabled = true;
 
     try {
       if (ensureAutoHistory) DbContext.EnsureAutoHistory();
-
-      return DbContext.SaveChanges(acceptAllChangesOnSuccess);
+      
+      var res = DbContext.SaveChanges(acceptAllChangesOnSuccess);
+      if(res != 0) Commit();
+      return res;
+    }
+    catch (Exception ex) {
+      Rollback();
+      throw;
     }
     finally {
       DbContext.ChangeTracker.AutoDetectChangesEnabled = autoDetectChangesEnabled;
@@ -124,7 +102,7 @@ public abstract class UnitOfWorkBase : IUnitOfWork
     foreach (var dbEntityEntry in dbEntityEntries) dbEntityEntry.State = EntityState.Detached;
   }
 
-  public void UseTransaction(DbTransaction transaction, Guid? transactionId = null) {
+  protected void UseTransaction(DbTransaction transaction, Guid? transactionId = null) {
     if (transaction == null) throw new ArgumentNullException(nameof(transaction), $"{nameof(transaction)} cannot be null.");
 
     if (_transaction != null) throw new InvalidOperationException("There's already an active transaction.");
@@ -134,23 +112,23 @@ public abstract class UnitOfWorkBase : IUnitOfWork
                      : DbContext.Database.UseTransaction(transaction, transactionId.Value);
   }
 
-  public void EnlistTransaction(Transaction transaction) {
+  protected void EnlistTransaction(Transaction transaction) {
     if (transaction == null) throw new ArgumentNullException(nameof(transaction), $"{nameof(transaction)} cannot be null.");
 
     DbContext.Database.EnlistTransaction(transaction);
   }
 
-  public Transaction GetEnlistedTransaction() {
+  protected Transaction? GetEnlistedTransaction() {
     return DbContext.Database.GetEnlistedTransaction();
   }
 
-  public void BeginTransaction(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted) {
+  protected void BeginTransaction(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted) {
     if (_transaction != null) throw new InvalidOperationException("There's already an active transaction.");
 
     _transaction = DbContext.Database.BeginTransaction(isolationLevel);
   }
 
-  public void Commit() {
+  protected void Commit() {
     try {
       if (_transaction == null) throw new InvalidOperationException("There's no active transaction.");
 
@@ -165,7 +143,7 @@ public abstract class UnitOfWorkBase : IUnitOfWork
     }
   }
 
-  public void Rollback() {
+  protected void Rollback() {
     try {
       _transaction?.Rollback();
     }
@@ -249,7 +227,7 @@ public abstract class UnitOfWorkBase : IUnitOfWork
     }
   }
 
-  public async Task UseTransactionAsync(DbTransaction transaction, Guid? transactionId = null, CancellationToken cancellationToken = default) {
+  protected async Task UseTransactionAsync(DbTransaction transaction, Guid? transactionId = null, CancellationToken cancellationToken = default) {
     if (transaction == null) throw new ArgumentNullException(nameof(transaction), $"{nameof(transaction)} cannot be null.");
 
     if (_transaction != null) throw new InvalidOperationException("There's already an active transaction.");
@@ -259,13 +237,13 @@ public abstract class UnitOfWorkBase : IUnitOfWork
                      : await DbContext.Database.UseTransactionAsync(transaction, transactionId.Value, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
   }
 
-  public async Task BeginTransactionAsync(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted, CancellationToken cancellationToken = default) {
+  protected async Task BeginTransactionAsync(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted, CancellationToken cancellationToken = default) {
     if (_transaction != null) throw new InvalidOperationException("There's already an active transaction.");
 
     _transaction = await DbContext.Database.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
   }
 
-  public async Task CommitAsync(CancellationToken cancellationToken = default) {
+  protected async Task CommitAsync(CancellationToken cancellationToken = default) {
     try {
       if (_transaction == null) throw new InvalidOperationException("There's no active transaction.");
 
@@ -283,7 +261,7 @@ public abstract class UnitOfWorkBase : IUnitOfWork
     }
   }
 
-  public async Task RollbackAsync(CancellationToken cancellationToken = default) {
+  protected async Task RollbackAsync(CancellationToken cancellationToken = default) {
     try {
       if (_transaction != null) await _transaction.RollbackAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
     }
@@ -317,15 +295,12 @@ public abstract class UnitOfWorkBase : IUnitOfWork
 
   #region Public Methods
 
-  public static int SaveChanges(bool useTransaction = true, TimeSpan? timeout = null, bool acceptAllChangesOnSuccess = true, bool ensureAutoHistory = false, params IUnitOfWork[] unitOfWorks) {
+  public static int SaveChanges(bool useTransaction = true, TimeSpan? timeout = null, bool acceptAllChangesOnSuccess = true, bool ensureAutoHistory = false, params IUnitOfWorkBase[] unitOfWorks) {
     if (!(unitOfWorks?.Any() ?? false)) return 0;
 
     var count = 0;
 
-    void SaveChangesInternal() {
-      foreach (var unitOfWork in unitOfWorks) count += unitOfWork.SaveChanges(acceptAllChangesOnSuccess, ensureAutoHistory);
-    }
-
+    
     if (useTransaction) {
       using var transactionScope = TransactionScopeFactory.CreateTransactionScope(timeout: timeout ?? TransactionManager.MaximumTimeout);
 
@@ -338,9 +313,14 @@ public abstract class UnitOfWorkBase : IUnitOfWork
     }
 
     return count;
+    
+    void SaveChangesInternal() {
+      foreach (var unitOfWork in unitOfWorks) count += unitOfWork.SaveChanges(acceptAllChangesOnSuccess, ensureAutoHistory);
+    }
+
   }
 
-  public static async Task<int> SaveChangesAsync(bool useTransaction = true, TimeSpan? timeout = null, bool acceptAllChangesOnSuccess = true, bool ensureAutoHistory = false, CancellationToken cancellationToken = default, params IUnitOfWork[] unitOfWorks) {
+  public static async Task<int> SaveChangesAsync(bool useTransaction = true, TimeSpan? timeout = null, bool acceptAllChangesOnSuccess = true, bool ensureAutoHistory = false, CancellationToken cancellationToken = default, params IUnitOfWorkBase[] unitOfWorks) {
     if (!(unitOfWorks?.Any() ?? false)) return await Task.FromResult(0).ConfigureAwait(false);
 
     var count = 0;
@@ -367,18 +347,6 @@ public abstract class UnitOfWorkBase : IUnitOfWork
 
   #region Private Methods
 
-  private IRepository GetRepository(Type objectType, Func<DbContext, Type, IRepository> repositoryFactory, string prefix) {
-    var typeName = $"{prefix}.{objectType.FullName}";
-
-    if (!_repositories.TryGetValue(typeName, out var repository)) {
-      repository = repositoryFactory.Invoke(DbContext, objectType);
-
-      _repositories[typeName] = repository;
-    }
-
-    return repository;
-  }
-
   private void DisposeTransaction() {
     if (_transaction != null) {
       _transaction.Dispose();
@@ -400,22 +368,15 @@ public abstract class UnitOfWorkBase : IUnitOfWork
   private bool _disposed;
 
   protected virtual void Dispose(bool disposing) {
-    if (!_disposed)
-      if (disposing) {
-        DisposeTransaction();
-
-        if (DbContext.Database.IsRelational()) {
-          var connection = DbContext.Database.GetDbConnection();
-          if (connection != null && connection.State != ConnectionState.Closed) connection.Close();
-
-          DbContext.Dispose();
-        }
-
-        foreach (var repository in _repositories.Values) repository.Dispose();
-
-        _repositories.Clear();
+    if (_disposed) return;
+    if (disposing) {
+      DisposeTransaction();
+      if (DbContext.Database.IsRelational()) {
+        var connection = DbContext.Database.GetDbConnection();
+        if (connection?.State != ConnectionState.Closed) connection?.Close();
+        DbContext.Dispose();
       }
-
+    }
     _disposed = true;
   }
 
@@ -425,46 +386,4 @@ public abstract class UnitOfWorkBase : IUnitOfWork
   }
 
   #endregion IDisposable Members
-}
-
-public class UnitOfWorkBase<T> : UnitOfWorkBase,
-                             IUnitOfWork<T> where T : DbContext
-{
-  #region Ctor
-
-  public UnitOfWorkBase(T dbContext)
-    : base(dbContext) { }
-
-  #endregion Ctor
-}
-
-public class PooledUnitOfWork<T> : UnitOfWorkBase<T>,
-                                   IPooledUnitOfWork<T> where T : DbContext
-{
-  #region Ctor
-
-  public PooledUnitOfWork(IDbContextFactory<T> dbContextFactory)
-    : base(CreateDbContext(dbContextFactory)) {
-    DbContextFactory = dbContextFactory;
-  }
-
-  #endregion Ctor
-
-  #region IPooledUnitOfWork Members
-
-  public IDbContextFactory<T> DbContextFactory { get; }
-
-  #endregion IPooledUnitOfWork Members
-
-  #region Private Methods
-
-  private static T CreateDbContext(IDbContextFactory<T> dbContextFactory) {
-    if (dbContextFactory == null) throw new ArgumentNullException(nameof(dbContextFactory), $"{nameof(dbContextFactory)} cannot be null.");
-
-    var dbContext = dbContextFactory.CreateDbContext();
-
-    return dbContext;
-  }
-
-  #endregion Private Methods
 }

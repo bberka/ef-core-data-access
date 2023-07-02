@@ -689,21 +689,6 @@ public class Repository<T> : IRepository<T> where T : class
 
   #endregion IAsyncRepository<T> Members
 
-  #region IDisposable Members
 
-  private bool _disposed;
 
-  protected virtual void Dispose(bool disposing) {
-    if (!_disposed)
-      if (disposing) { }
-
-    _disposed = true;
-  }
-
-  public void Dispose() {
-    Dispose(true);
-    GC.SuppressFinalize(this);
-  }
-
-  #endregion IDisposable Members
 }

@@ -28,8 +28,13 @@ The owner of the original repository, i dont know what he/she thinking but set a
 
 ## What i did to improve ?
 Merged Abstractions to single projects and implementation to single project
+
 Re-named it
+
 Removed some worrysome methods/properties from UnitOfWork (e.g. DbContext, transactions)
+
 Made UnitOfWork a base abstract class so you have to actually create your own unit of work class and implement the necessary repositories inside it.
+
 Since repositories provides almost same access as DbSet i'm not using them with an interface and initializing those in UnitOfWork constructor.
+
 You should be creating an interface named IUnitOfWork define your repositories inside it. 
